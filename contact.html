@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <!-- <meta http-equiv="X-UA-Compatible" content="IE=edge"> -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact| Submit Question</title>
+</head>
+<body>
+    <h2>Contact</h2>
+
+    <form action="" method = "POST" >
+        <p id="responses" display = "none" ></p>
+        
+        <!-- <label for="fullname"><strong>Full Name</strong></label> -->
+        <label for="fullname">Full Name</label>
+        <input type="text" name="fullname" id="fullname">
+
+        <br>
+        <br>
+        <!-- <label for="email"><strong>Email</strong></label> -->
+        <label for="email">Email</label>
+        <input type="text" name="email" id="email">
+
+        <br>
+        <br>
+        <!-- <label for="description"><strong>Question</strong></label> -->
+        <label for="description">Question</label>
+        <br>
+        <br>
+        <!-- <input type="text" name="description" id="description"> -->
+        <textarea name="description" id="description" cols="50" rows="14"></textarea>
+        <br>
+        <br>
+        <input type="button" id = "submit" value="submit">
+
+    </form>
+    
+    <script type="text/javascript">
+        const client_request = new XMLHttpRequest();
+
+        //get the elements
+        const form_element = {
+            fullname: document.getElementById('fullname'),
+            email: document.getElementById('email'),
+            description: document.getElementById('description'),
+            submit: document.getElementById('submit'),
+            responses: document.getElementById('responses')
+        };
+
+        form_element.submit.addEventListener('click', build_request);
+
+        function build_request() {
+                         
+            let fullname = form_element.fullname.value;
+            let email = form_element.email.value;
+            let description = form_element.description.value;
+            let request_type = 'add';
+
+            let response = '';
+            let status = '';
+            const done = 4;
+            const ok = 200;
+
+            const request_data = {
+
+                data: 
+                {
+                    fullname: `${fullname}`,
+                    email: `${email}`,
+                    description: `${description}`
+                },
+
+                type: `${request_type}`
+            };
+
+            const packet = JSON.stringify(request_data);
+
+            client_request.open("POST", "http://localhost/Air_Pollution_DWEB/Use_Cases/app_exe_scripts/Questions/add_question.php");
+            client_request.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+            client_request.send(packet);
+
+            client_request.onreadystatechange = function() 
+            {
+                if (client_request.readyState === done && 
+                    client_request.status === ok) 
+                {
+                    console.log(client_request.responseText);
+                    response = JSON.parse(client_request.responseText);
+                    console.log(response);
+                }
+
+                if (response) 
+                {
+                    const success = "Your question was submitted successfully";
+                    const fail = "Your question was unsuccessfully submitted";
+                    status_ok = (response.status === 'ok') ? true : false;
+                    if (status_ok === true) 
+                    {
+                        form_element.responses.textContent = success;
+                        form_element.responses.style.display = "block";
+                        form_element.fullname.innerText = '';
+                        form_element.email.innerText = '';
+                        form_element.description.innerText = '';
+                    }
+                    else
+                    {                        
+                        form_element.responses.textContent = fail;
+                        form_element.responses.style.display = "block";
+                        form_element.fullname.innerText = '';
+                        form_element.email.innerText = '';
+                        form_element.description.innerText = '';
+                    }
+                }
+            }
+        }
+
+        function response(client_request) 
+        {
+            response = null;
+            done = 4;
+            ok = 200;
+
+            try 
+            {
+                if (client_request.readyState === done && 
+                    client_request.status === ok) 
+                {
+                    console.log(client_request.responseText);
+                    // response = JSON.parse(client_request.response);
+                    // console.log(response);
+                }
+
+                 if (response) 
+                {
+                
+                    status_ok = (response.status === 'ok') ? true : false;
+                    if (status_ok === true) 
+                    {
+                        const tag = document.createElement('li');
+                        form_element.responses.appendChild(tag);
+                        const li = form_element.responses.getElementsByTagName('li');
+                        li.value = "Your question was submitted successfully";
+                    }
+                    else
+                    {
+                        const tag = document.createElement('li');
+                        form_element.responses.appendChild(tag);
+                        const li = form_element.responses.getElementsByTagName('li');
+                        li.value = "Your question was unsuccessfully submitted";
+                    }
+                }
+            } 
+            catch (error) {
+                console.log(client_request);
+                console.error(error);
+            }
+
+        }
+    </script>
+    
+</body>
+</html>
